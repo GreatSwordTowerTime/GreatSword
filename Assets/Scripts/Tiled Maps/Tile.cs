@@ -12,18 +12,18 @@ public class Tile {
 
 	public TILE type;
 
-	public int[] texCoor;
+	public int[] texturecoordinates;
 
 	public Tile (TILE type) {
 		this.type = type;
 		if(type == TILE.STONE)
-			texCoor = new int[2] {0,0};
+			texturecoordinates = new int[2] {1,0};
 
 		if(type == TILE.MOSSYSTONE)
-			texCoor = new int[2] {1,0};
+			texturecoordinates = new int[2] {0,0};
 
-		if (type == TILE.BLANK)
-			texCoor = new int[2] {63, 63};
+		if(type == TILE.BLANK)
+			texturecoordinates = new int[] {63,63};
 
 	}
 }

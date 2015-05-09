@@ -14,17 +14,25 @@ public class TiledMap {
 		this.height = height;
 
 		tiles = new Tile[width, height];
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				tiles[x,y] = new Tile (TILE.STONE);
+		if (!PlayerPrefs.HasKey ("TilesSaved")) {
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					tiles[x,y] = new Tile (TILE.STONE);
+					PlayerPrefs.SetInt ("tile" + x.ToString () + y.ToString (), (int)TILE.STONE);
+				}
+			}
+		} else {
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					tiles[x,y] = new Tile ((TILE)PlayerPrefs.GetInt ("tile" + x.ToString () + y.ToString ()));
+				}
 			}
 		}
-		tiles[0, 0] = new Tile (TILE.STONE);
 			
 	}
 
 	public int[] getTileTexCoordinatesAt (int x, int y) {
-		return tiles[x,y].texCoor;
+		return tiles[x,y].texturecoordinates;
 	}
 
 }

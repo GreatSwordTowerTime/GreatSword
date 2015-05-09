@@ -3,22 +3,31 @@ using System.Collections;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshCollider))]
+[ExecuteInEditMode]
 public class TiledMapGeneration : MonoBehaviour {
 
 	public int size_x = 100;
 	public int size_y = 50;
 	public float tileSize = 1.0f;
-	//for uv mapping
-	public int tileTexSize;
-	//Size of texture for mapping uv's
-	public int textureSize;
 
-	//public Texture2D terrainTiles;
-	//public int tileResolution = 16;
+	public Texture2D terrainTiles;
+	public int tileResolution = 16;
+	public int numTilesPerRow;
+	public int numRows;
 
 	public TiledMap tiledmap;
 
-	/*Color[][] ChopUpTiles () {
+	Mesh mesh;
+
+	MeshFilter mesh_filter;
+
+	TileVerts[] verts;
+	Vector2[] uv;
+	Vector3[] normals;
+	Vector3[] vertices;
+
+	Color[][] ChopUpTiles () {
 
 
 		Color[][] tiles = new Color[numTilesPerRow * numRows][];
@@ -59,7 +68,7 @@ public class TiledMapGeneration : MonoBehaviour {
 
 		MeshRenderer mesh_renderer = GetComponent <MeshRenderer> ();
 		mesh_renderer.sharedMaterials[0].mainTexture = texture;
-	}*/
+	}
 
 	public void BuildMesh () {
 
@@ -68,21 +77,24 @@ public class TiledMapGeneration : MonoBehaviour {
 		int numTiles = size_x * size_y;
 		int numTris = numTiles * 2;
 
+		//int vsize_x = size_x * 2;
+		//int vsize_y = size_y * 2;
+
 		int numVerts = numTiles * 4;
 
-		Vector3[] vertices = new Vector3[numVerts];
-		Vector3[] normals = new Vector3[numVerts];
-		Vector2[] uv = new Vector2[numVerts];
+		vertices = new Vector3[numVerts];
+		normals = new Vector3[numVerts];
+		uv = new Vector2[numVerts];
 		int[] triangles = new int[numTris * 3];
+		verts = new TileVerts[numTiles];
 
 		int x, y;
 
-		TileVerts[] verts= new TileVerts[numTiles]; 
+		//TileVerts[] verts= new TileVerts[numTiles]; 
 
 		for (y = 0; y < size_y; y++) {
 			for(x = 0; x < size_x; x++) {
-				verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, tileTexSize, textureSize,
-					tiledmap.tiles[x,y].texCoor[0] * tileTexSize, tiledmap.tiles[x,y].texCoor[1] * tileTexSize); 
+				verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, size_x, size_y); 
 			}
 		}
 
@@ -96,6 +108,16 @@ public class TiledMapGeneration : MonoBehaviour {
 				a++;
 			}
 		}
+
+
+
+		/*for (y = 0; y < vsize_y; y++) {
+			for(x = 0; x < vsize_x; x++) {
+				vertices[y * vsize_x + x] = new Vector3 (x * tileSize, y * tileSize);
+				normals[y * vsize_x + x] = Vector3.back;
+				uv[y * vsize_x + x] = new Vector2 ((float) x / size_x, (float) y / size_y);
+			}
+		}*/
 		
 		for (y = 0; y < size_y; y++) {
 			for (x = 0; x < size_x; x++) {
@@ -112,18 +134,30 @@ public class TiledMapGeneration : MonoBehaviour {
 		}
 
 
-		Mesh mesh = new Mesh ();
+		mesh = new Mesh ();
 
 		mesh.vertices = vertices;
 		mesh.triangles = triangles;
 		mesh.normals = normals;
 		mesh.uv = uv;
 
-		MeshFilter mesh_filter = GetComponent <MeshFilter> ();
+		mesh_filter = GetComponent <MeshFilter> ();
 		mesh_filter.mesh = mesh;
+		BuildTexture ();
 
-		//BuildTexture ();
+	}
 
+	public void BuildTile (int x, int y) {
+		/*Debug.Log (tiledmap.tiles[x, y].type);
+		verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, size_x, size_y);
+		for (int i = 0; i < 4; i++)
+			uv[(y * size_x + x) * 4 + i] = verts[y * size_x + x].uv[i];
+		mesh.uv = uv;
+		mesh_filter.mesh = mesh;*/
+		BuildTexture ();
+		PlayerPrefs.SetInt ("tile" + x.ToString () + y.ToString (), (int)tiledmap.tiles[x, y].type);
+		PlayerPrefs.SetInt ("TilesSaved", 1);
+		PlayerPrefs.Save ();
 	}
 
 }
