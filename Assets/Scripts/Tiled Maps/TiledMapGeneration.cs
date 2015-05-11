@@ -44,7 +44,7 @@ public class TiledMapGeneration : MonoBehaviour {
 
 	void BuildTexture () {
 	
-		numTilesPerRow = terrainTiles.width / tileResolution;
+		/*numTilesPerRow = terrainTiles.width / tileResolution;
 		numRows = terrainTiles.height / tileResolution;
 
 		int texWidth = size_x * tileResolution;
@@ -61,13 +61,15 @@ public class TiledMapGeneration : MonoBehaviour {
 			}
 		}
 
+
+
 		texture.filterMode = FilterMode.Point;
 		texture.wrapMode = TextureWrapMode.Clamp;
 
-		texture.Apply ();
+		texture.Apply ();*/
 
 		MeshRenderer mesh_renderer = GetComponent <MeshRenderer> ();
-		mesh_renderer.sharedMaterials[0].mainTexture = texture;
+		mesh_renderer.sharedMaterial.mainTexture = terrainTiles;
 	}
 
 	public void BuildMesh () {
@@ -94,7 +96,8 @@ public class TiledMapGeneration : MonoBehaviour {
 
 		for (y = 0; y < size_y; y++) {
 			for(x = 0; x < size_x; x++) {
-				verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, size_x, size_y); 
+				verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, 
+					tileResolution, size_x, size_y, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution); 
 			}
 		}
 
@@ -148,13 +151,13 @@ public class TiledMapGeneration : MonoBehaviour {
 	}
 
 	public void BuildTile (int x, int y) {
-		/*Debug.Log (tiledmap.tiles[x, y].type);
-		verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, size_x, size_y);
+		Debug.Log (tiledmap.tiles[x, y].type);
+		verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, tileResolution, size_x, size_y, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution);
 		for (int i = 0; i < 4; i++)
 			uv[(y * size_x + x) * 4 + i] = verts[y * size_x + x].uv[i];
 		mesh.uv = uv;
-		mesh_filter.mesh = mesh;*/
-		BuildTexture ();
+		mesh_filter.mesh = mesh;
+		//BuildTexture ();
 		PlayerPrefs.SetInt ("tile" + x.ToString () + y.ToString (), (int)tiledmap.tiles[x, y].type);
 		PlayerPrefs.SetInt ("TilesSaved", 1);
 		PlayerPrefs.Save ();

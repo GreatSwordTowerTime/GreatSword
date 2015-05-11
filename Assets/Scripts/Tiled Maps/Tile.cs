@@ -23,7 +23,7 @@ public class Tile {
 			texturecoordinates = new int[2] {0,0};
 
 		if(type == TILE.BLANK)
-			texturecoordinates = new int[] {63,63};
+			texturecoordinates = new int[2] {63,63};
 
 	}
 }

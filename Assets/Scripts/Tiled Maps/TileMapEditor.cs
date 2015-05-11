@@ -52,8 +52,4 @@ public class TileMapEditor : Editor {
 			Debug.Log (mouseToTile);
 		}
 	}
-
-	void OnEnable () {
-
-	}
 }
