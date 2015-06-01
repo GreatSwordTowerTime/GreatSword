@@ -13,8 +13,12 @@ public class TileMapEditor : Editor {
 
 		selected = EditorGUILayout.Popup (selected, list);
 
-		if(GUILayout.Button("Rebuild Tile Map")) {
-			map.BuildMesh();
+		if(GUILayout.Button("Reset Tile Map")) {
+			map.BuildMesh (true);
+		}
+
+		if(GUILayout.Button("Build Tile Map")) {
+			map.BuildMesh (false);
 		}
 	}
 
@@ -61,7 +65,6 @@ public class TileMapEditor : Editor {
 				}
 				tiledMapG.BuildTile ((int)mouseToTile.x, (int)mouseToTile.y);
 			}
-			else GUIUtility.hotControl = 0;
 		}
 	}
 }

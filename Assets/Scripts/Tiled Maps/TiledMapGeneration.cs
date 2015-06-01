@@ -11,12 +11,12 @@ public class TiledMapGeneration : MonoBehaviour {
 	public int size_y = 50;
 	public float tileSize = 1.0f;
 
-	public Texture2D terrainTiles;
 	public int tileResolution = 16;
-	public int numTilesPerRow;
-	public int numRows;
+
+	public Texture2D terrainTiles;
 
 	public GameObject[] tileObjects;
+
 	public TiledMap tiledmap;
 
 	Mesh mesh;
@@ -26,60 +26,25 @@ public class TiledMapGeneration : MonoBehaviour {
 	TileVerts[] verts;
 	Vector2[] uv;
 
-	Color[][] ChopUpTiles () {
+	public void BuildMesh (bool resetTileMap) {
 
+		int x, y;
 
-		Color[][] tiles = new Color[numTilesPerRow * numRows][];
-
-		for (int y = 0; y < numRows; y++) {
-			for (int x = 0; x < numTilesPerRow; x++) {
-				tiles[y * numTilesPerRow + x] = terrainTiles.GetPixels (x * tileResolution, y * tileResolution, tileResolution, tileResolution);
-			}
-
-		}
-
-		return tiles;
-	}
-
-	void BuildTexture () {
-	
-		/*numTilesPerRow = terrainTiles.width / tileResolution;
-		numRows = terrainTiles.height / tileResolution;
-
-		int texWidth = size_x * tileResolution;
-		int textHeight = size_y * tileResolution;
-
-		Texture2D texture = new Texture2D (texWidth, textHeight);
-
-		Color[][] tiles = ChopUpTiles ();
-		
-		for (int y = 0; y < size_y; y++) {
-			for (int x = 0; x < size_x; x++) {
-				Color[] p = tiles[tiledmap.getTileTexCoordinatesAt (x, y)[1] * numTilesPerRow + tiledmap.getTileTexCoordinatesAt (x, y)[0]];
-				texture.SetPixels (x * tileResolution, y * tileResolution, tileResolution, tileResolution, p);
+		if (resetTileMap) {
+			//tiledmap = ScriptableObject.CreateInstance <TiledMap> ();
+			tiledmap.tiles = new Tile[size_x, size_y];
+			tiledmap.width = size_x;
+			tiledmap.height = size_y;
+				
+			for (x = 0; x < size_x; x++) {
+				for (y = 0; y < size_y; y++) {
+					tiledmap.tiles[x,y] = new Tile (TILE.STONE);
+				}
 			}
 		}
-
-
-
-		texture.filterMode = FilterMode.Point;
-		texture.wrapMode = TextureWrapMode.Clamp;
-
-		texture.Apply ();*/
-
-		MeshRenderer mesh_renderer = GetComponent <MeshRenderer> ();
-		mesh_renderer.sharedMaterial.mainTexture = terrainTiles;
-	}
-
-	public void BuildMesh () {
-
-		tiledmap = new TiledMap (size_x, size_y);
 
 		int numTiles = size_x * size_y;
 		int numTris = numTiles * 2;
-
-		//int vsize_x = size_x * 2;
-		//int vsize_y = size_y * 2;
 
 		int numVerts = numTiles * 4;
 
@@ -89,9 +54,7 @@ public class TiledMapGeneration : MonoBehaviour {
 		int[] triangles = new int[numTris * 3];
 		verts = new TileVerts[numTiles];
 
-		int x, y;
 
-		//TileVerts[] verts= new TileVerts[numTiles]; 
 
 		for (y = 0; y < size_y; y++) {
 			for(x = 0; x < size_x; x++) {
@@ -134,12 +97,78 @@ public class TiledMapGeneration : MonoBehaviour {
 
 		mesh_filter = GetComponent <MeshFilter> ();
 		mesh_filter.mesh = mesh;
-		BuildTexture ();
+		MeshRenderer mesh_renderer = GetComponent <MeshRenderer> ();
+		mesh_renderer.sharedMaterial.mainTexture = terrainTiles;
+		BuildTileProperties ();
 
 	}
 
 	public void BuildTileProperties () {
-	
+		Debug.Log ("Building Colliders");
+		foreach (GameObject g in GameObject.FindGameObjectsWithTag ("Tile"))
+			DestroyImmediate (g);
+		for (int i = 0; i < tileObjects.Length; i++) {
+			GameObject tilesProperties = (GameObject)Instantiate (tileObjects[i]);
+			TileProperties t = tileObjects[i].GetComponent <TileProperties> ();
+			if(t.hasCollider) {
+			
+				for (int x = 0; x < size_x; x++) {
+					for (int y = 0; y < size_y; y++) {
+						if ((int)tiledmap.tiles[x, y].type != t.tile && tiledmap.tiles[x, y].hasCollider == false) {
+							if ((int)tiledmap.tiles[x + 1, y].type == t.tile) {
+								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+								bx2D.offset = new Vector2 (tileSize/2f + x + tileSize, tileSize/2f + y);
+								bx2D.size = new Vector2 (tileSize, tileSize);
+								bx2D.isTrigger = t.isTrigger;
+							}
+							if ((int)tiledmap.tiles[x, y + 1].type == t.tile) {
+								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+								bx2D.offset = new Vector2 (tileSize/2f + x, tileSize/2f + y + tileSize);
+								bx2D.size = new Vector2 (tileSize, tileSize);
+								bx2D.isTrigger = t.isTrigger;
+							}
+							if ((int)tiledmap.tiles[x + 1, y + 1].type == t.tile) {
+								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+								bx2D.offset = new Vector2 (tileSize/2f + x + tileSize, tileSize/2f + y + tileSize);
+								bx2D.size = new Vector2 (tileSize, tileSize);
+								bx2D.isTrigger = t.isTrigger;
+							}
+							if ((int)tiledmap.tiles[x - 1, y].type == t.tile) {
+								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+								bx2D.offset = new Vector2 (tileSize/2f + x - tileSize, tileSize/2f + y);
+								bx2D.size = new Vector2 (tileSize, tileSize);
+								bx2D.isTrigger = t.isTrigger;
+							}
+							if ((int)tiledmap.tiles[x, y - 1].type == t.tile) {
+								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+								bx2D.offset = new Vector2 (tileSize/2f + x, tileSize/2f + y - tileSize);
+								bx2D.size = new Vector2 (tileSize, tileSize);
+								bx2D.isTrigger = t.isTrigger;
+							}
+							if ((int)tiledmap.tiles[x - 1, y - 1].type == t.tile) {
+								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+								bx2D.offset = new Vector2 (tileSize/2f + x - tileSize, tileSize/2f + y - tileSize);
+								bx2D.size = new Vector2 (tileSize, tileSize);
+								bx2D.isTrigger = t.isTrigger;
+							}
+							if ((int)tiledmap.tiles[x + 1, y - 1].type == t.tile) {
+								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+								bx2D.offset = new Vector2 (tileSize/2f + x + tileSize, tileSize/2f + y - tileSize);
+								bx2D.size = new Vector2 (tileSize, tileSize);
+								bx2D.isTrigger = t.isTrigger;
+							}
+							if ((int)tiledmap.tiles[x - 1, y + 1].type == t.tile) {
+								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+								bx2D.offset = new Vector2 (tileSize/2f + x - tileSize, tileSize/2f + y + tileSize);
+								bx2D.size = new Vector2 (tileSize, tileSize);
+								bx2D.isTrigger = t.isTrigger;
+							}
+						}
+					}
+				}
+			}
+			tilesProperties.transform.parent = transform;
+		}
 	}
 
 	public void BuildTile (int x, int y) {
@@ -151,10 +180,6 @@ public class TiledMapGeneration : MonoBehaviour {
 		}
 		mesh.uv = uv;
 		GetComponent <MeshFilter> ().mesh = mesh;
-		BuildTexture ();
-		/*PlayerPrefs.SetInt ("tile" + x.ToString () + y.ToString (), (int)tiledmap.tiles[x, y].type);
-		PlayerPrefs.SetInt ("TilesSaved", 1);
-		PlayerPrefs.Save ();*/
 	}
 
 }

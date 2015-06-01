@@ -48,9 +48,11 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\PixelPerfectC.cs" />
      <Compile Include="Assets\Scripts\PlayerMovement.cs" />
+     <Compile Include="Assets\Scripts\ScriptableObjectUtility.cs" />
      <Compile Include="Assets\Scripts\SwingSword.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\MouseOver.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\Tile.cs" />
+     <Compile Include="Assets\Scripts\Tiled Maps\TileMapData.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\TileMapEditor.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\TileProperties.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\TileVerts.cs" />
