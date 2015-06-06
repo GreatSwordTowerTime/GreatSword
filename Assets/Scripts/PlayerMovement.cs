@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void OnTriggerStay2D (Collider2D col) {
-		if (col.GetComponent<Collider2D>().CompareTag ("Ground")) {
+		if (col.GetComponent<Collider2D>().CompareTag ("Ground") || col.GetComponent<Collider2D>().CompareTag ("Tile")) {
 			//reset all variables
 			jumping = false;
 			isGrounded = true;

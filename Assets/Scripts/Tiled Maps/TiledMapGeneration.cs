@@ -1,17 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshCollider))]
 [ExecuteInEditMode]
 public class TiledMapGeneration : MonoBehaviour {
 
-	public int size_x = 100;
-	public int size_y = 50;
 	public float tileSize = 1.0f;
 
 	public int tileResolution = 16;
+
+	private int width;
+
+	private int height;
 
 	public Texture2D terrainTiles;
 
@@ -32,18 +34,36 @@ public class TiledMapGeneration : MonoBehaviour {
 
 		if (resetTileMap) {
 			//tiledmap = ScriptableObject.CreateInstance <TiledMap> ();
-			tiledmap.tiles = new Tile[size_x, size_y];
-			tiledmap.width = size_x;
-			tiledmap.height = size_y;
+			tiledmap.tiles = new Tile[tiledmap.width, tiledmap.height];
 				
-			for (x = 0; x < size_x; x++) {
-				for (y = 0; y < size_y; y++) {
+			for (x = 0; x < tiledmap.width; x++) {
+				for (y = 0; y < tiledmap.height; y++) {
 					tiledmap.tiles[x,y] = new Tile (TILE.STONE);
 				}
 			}
+			width = tiledmap.width;
+			height = tiledmap.height;
+		} else {
+			Tile[,] tempTiles = new Tile[tiledmap.width, tiledmap.height];
+			for (x = 0; x < width; x++) {
+				for (y = 0; y < height; y++) {
+						tempTiles[x, y] = tiledmap.tiles[x, y];
+				}
+			}
+
+			for (x = 0; x < tiledmap.width; x++) {
+				for (y = 0; y < tiledmap.height; y++) {
+					if (tempTiles[x, y] == null)
+						tempTiles[x, y] = new Tile (TILE.STONE);
+				}
+			}
+			tiledmap.tiles = tempTiles;
+			width = tiledmap.width;
+			height = tiledmap.height;
+
 		}
 
-		int numTiles = size_x * size_y;
+		int numTiles = tiledmap.width * tiledmap.height;
 		int numTris = numTiles * 2;
 
 		int numVerts = numTiles * 4;
@@ -56,9 +76,9 @@ public class TiledMapGeneration : MonoBehaviour {
 
 
 
-		for (y = 0; y < size_y; y++) {
-			for(x = 0; x < size_x; x++) {
-				verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, 
+		for (y = 0; y < tiledmap.height; y++) {
+			for(x = 0; x < tiledmap.width; x++) {
+				verts[y * tiledmap.width + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, 
 					tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution); 
 			}
 		}
@@ -74,9 +94,9 @@ public class TiledMapGeneration : MonoBehaviour {
 			}
 		}
 		
-		for (y = 0; y < size_y; y++) {
-			for (x = 0; x < size_x; x++) {
-				int squareIndex = y * size_x + x;
+		for (y = 0; y < tiledmap.height; y++) {
+			for (x = 0; x < tiledmap.width; x++) {
+				int squareIndex = y * tiledmap.width + x;
 				int triOffset = squareIndex * 6;
 				//int vertOffset = 
 				triangles[triOffset] = (squareIndex) * 4 + 0;
@@ -112,8 +132,8 @@ public class TiledMapGeneration : MonoBehaviour {
 			TileProperties t = tileObjects[i].GetComponent <TileProperties> ();
 			if(t.hasCollider) {
 			
-				for (int x = 0; x < size_x; x++) {
-					for (int y = 0; y < size_y; y++) {
+				for (int x = 0; x < tiledmap.width; x++) {
+					for (int y = 0; y < tiledmap.height; y++) {
 						if ((int)tiledmap.tiles[x, y].type != t.tile && tiledmap.tiles[x, y].hasCollider == false) {
 							if ((int)tiledmap.tiles[x + 1, y].type == t.tile) {
 								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
@@ -172,14 +192,13 @@ public class TiledMapGeneration : MonoBehaviour {
 	}
 
 	public void BuildTile (int x, int y) {
-		verts[y * size_x + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize,
+		verts[y * tiledmap.width + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize,
 			tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution);
 		for (int i = 0; i < 4; i++) {
-			uv[(y * size_x + x) * 4 + i] = verts[y * size_x + x].uv[i];
-			mesh.uv[(y * size_x + x) * 4 + i] = verts[y * size_x + x].uv[i];
+			uv[(y * tiledmap.width + x) * 4 + i] = verts[y * tiledmap.width + x].uv[i];
+			mesh.uv[(y * tiledmap.width + x) * 4 + i] = verts[y * tiledmap.width + x].uv[i];
 		}
 		mesh.uv = uv;
 		GetComponent <MeshFilter> ().mesh = mesh;
 	}
-
 }

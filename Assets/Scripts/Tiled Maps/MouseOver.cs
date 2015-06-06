@@ -10,6 +10,8 @@ public class MouseOver : MonoBehaviour {
 	int x;
 	int y;
 
+	public static Vector2 mouseCoor;
+
 	void Start () {
 		map = GetComponent <TiledMapGeneration> ();
 	}
@@ -22,6 +24,7 @@ public class MouseOver : MonoBehaviour {
 			x = Mathf.FloorToInt (rc.point.x / map.tileSize);
 			y = Mathf.FloorToInt (rc.point.y / map.tileSize);
 		}
+		mouseCoor = new Vector2 (x, y);
 	}
 
 	public Vector2 getMouseCoor () {
