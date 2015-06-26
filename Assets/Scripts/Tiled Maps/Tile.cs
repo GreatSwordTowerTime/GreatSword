@@ -1,23 +1,27 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
-
+[Serializable]
 public enum TILE : int {
 	STONE,
-	MOSSYSTONE,
-	BLANK,
 	STONEBG,
+	MOSSYSTONE,
 	MOSSYBG,
 	BURNEDMOSSY,
-	BURNEDSTONE
+	BURNEDSTONE,
+	BLANK
 }
-
+[Serializable]
 public class Tile {
 
-
+	[SerializeField]
 	public TILE type;
-
+	[SerializeField]
 	public int[] texCoor;
+	[SerializeField]
 	public bool hasCollider;
+	[SerializeField]
+	public bool isTrigger = false;
 
 	public Tile (TILE type) {
 		this.type = type;

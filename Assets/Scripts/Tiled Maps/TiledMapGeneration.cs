@@ -1,25 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System;
+using System.Text;
+using System.Xml;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-[ExecuteInEditMode]
 public class TiledMapGeneration : MonoBehaviour {
 
 	public float tileSize = 1.0f;
 
 	public int tileResolution = 16;
 
-	private int width;
+	public int width;
 
-	private int height;
+	public int height;
 
 	public Texture2D terrainTiles;
 
 	public GameObject[] tileObjects;
 
 	public TiledMap tiledmap;
+
+	public bool displayLines;
 
 	Mesh mesh;
 
@@ -33,34 +37,28 @@ public class TiledMapGeneration : MonoBehaviour {
 		int x, y;
 
 		if (resetTileMap) {
-			//tiledmap = ScriptableObject.CreateInstance <TiledMap> ();
-			tiledmap.tiles = new Tile[tiledmap.width, tiledmap.height];
-				
-			for (x = 0; x < tiledmap.width; x++) {
-				for (y = 0; y < tiledmap.height; y++) {
-					tiledmap.tiles[x,y] = new Tile (TILE.STONE);
+
+			tiledmap = new TiledMap (width, height);
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"Assets/Levels/" + gameObject.name + ".txt"))
+			{
+				for (x = 0; x < tiledmap.width; x++) {
+					for (y = 0; y < tiledmap.height; y++) {
+						file.Write ("0.");
+					}
 				}
+
 			}
-			width = tiledmap.width;
-			height = tiledmap.height;
+
 		} else {
-			Tile[,] tempTiles = new Tile[tiledmap.width, tiledmap.height];
-			for (x = 0; x < width; x++) {
-				for (y = 0; y < height; y++) {
-						tempTiles[x, y] = tiledmap.tiles[x, y];
-				}
+
+			if (tiledmap.width == 0) {
+				tiledmap.width = width;
+				tiledmap.height = height;
+				Debug.Log ("Didn't remember the width and height. Current Width and Height are " + new Vector2 (width, height));
 			}
 
-			for (x = 0; x < tiledmap.width; x++) {
-				for (y = 0; y < tiledmap.height; y++) {
-					if (tempTiles[x, y] == null)
-						tempTiles[x, y] = new Tile (TILE.STONE);
-				}
-			}
-			tiledmap.tiles = tempTiles;
-			width = tiledmap.width;
-			height = tiledmap.height;
-
+			LoadTileMap ();
+			SaveTileMap ();
 		}
 
 		int numTiles = tiledmap.width * tiledmap.height;
@@ -76,9 +74,9 @@ public class TiledMapGeneration : MonoBehaviour {
 
 
 
-		for (y = 0; y < tiledmap.height; y++) {
-			for(x = 0; x < tiledmap.width; x++) {
-				verts[y * tiledmap.width + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, 
+		for (x = 0; x < tiledmap.width; x++) {
+			for(y = 0; y < tiledmap.height; y++) {
+				verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, 
 					tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution); 
 			}
 		}
@@ -94,9 +92,9 @@ public class TiledMapGeneration : MonoBehaviour {
 			}
 		}
 		
-		for (y = 0; y < tiledmap.height; y++) {
-			for (x = 0; x < tiledmap.width; x++) {
-				int squareIndex = y * tiledmap.width + x;
+		for (x = 0; x < tiledmap.width; x++) {
+			for (y = 0; y < tiledmap.height; y++) {
+				int squareIndex = x * tiledmap.height + y;
 				int triOffset = squareIndex * 6;
 				//int vertOffset = 
 				triangles[triOffset] = (squareIndex) * 4 + 0;
@@ -125,8 +123,12 @@ public class TiledMapGeneration : MonoBehaviour {
 
 	public void BuildTileProperties () {
 		Debug.Log ("Building Colliders");
-		foreach (GameObject g in GameObject.FindGameObjectsWithTag ("Tile"))
-			DestroyImmediate (g);
+		List <GameObject> children = new List <GameObject> ();
+		foreach (Transform child in transform) {
+			children.Add (child.gameObject);
+		}
+		children.ForEach (child => DestroyImmediate (child));
+
 		for (int i = 0; i < tileObjects.Length; i++) {
 			GameObject tilesProperties = (GameObject)Instantiate (tileObjects[i]);
 			TileProperties t = tileObjects[i].GetComponent <TileProperties> ();
@@ -134,55 +136,11 @@ public class TiledMapGeneration : MonoBehaviour {
 			
 				for (int x = 0; x < tiledmap.width; x++) {
 					for (int y = 0; y < tiledmap.height; y++) {
-						if ((int)tiledmap.tiles[x, y].type != t.tile && tiledmap.tiles[x, y].hasCollider == false) {
-							if ((int)tiledmap.tiles[x + 1, y].type == t.tile) {
-								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-								bx2D.offset = new Vector2 (tileSize/2f + x + tileSize, tileSize/2f + y);
-								bx2D.size = new Vector2 (tileSize, tileSize);
-								bx2D.isTrigger = t.isTrigger;
-							}
-							if ((int)tiledmap.tiles[x, y + 1].type == t.tile) {
-								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-								bx2D.offset = new Vector2 (tileSize/2f + x, tileSize/2f + y + tileSize);
-								bx2D.size = new Vector2 (tileSize, tileSize);
-								bx2D.isTrigger = t.isTrigger;
-							}
-							if ((int)tiledmap.tiles[x + 1, y + 1].type == t.tile) {
-								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-								bx2D.offset = new Vector2 (tileSize/2f + x + tileSize, tileSize/2f + y + tileSize);
-								bx2D.size = new Vector2 (tileSize, tileSize);
-								bx2D.isTrigger = t.isTrigger;
-							}
-							if ((int)tiledmap.tiles[x - 1, y].type == t.tile) {
-								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-								bx2D.offset = new Vector2 (tileSize/2f + x - tileSize, tileSize/2f + y);
-								bx2D.size = new Vector2 (tileSize, tileSize);
-								bx2D.isTrigger = t.isTrigger;
-							}
-							if ((int)tiledmap.tiles[x, y - 1].type == t.tile) {
-								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-								bx2D.offset = new Vector2 (tileSize/2f + x, tileSize/2f + y - tileSize);
-								bx2D.size = new Vector2 (tileSize, tileSize);
-								bx2D.isTrigger = t.isTrigger;
-							}
-							if ((int)tiledmap.tiles[x - 1, y - 1].type == t.tile) {
-								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-								bx2D.offset = new Vector2 (tileSize/2f + x - tileSize, tileSize/2f + y - tileSize);
-								bx2D.size = new Vector2 (tileSize, tileSize);
-								bx2D.isTrigger = t.isTrigger;
-							}
-							if ((int)tiledmap.tiles[x + 1, y - 1].type == t.tile) {
-								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-								bx2D.offset = new Vector2 (tileSize/2f + x + tileSize, tileSize/2f + y - tileSize);
-								bx2D.size = new Vector2 (tileSize, tileSize);
-								bx2D.isTrigger = t.isTrigger;
-							}
-							if ((int)tiledmap.tiles[x - 1, y + 1].type == t.tile) {
-								BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-								bx2D.offset = new Vector2 (tileSize/2f + x - tileSize, tileSize/2f + y + tileSize);
-								bx2D.size = new Vector2 (tileSize, tileSize);
-								bx2D.isTrigger = t.isTrigger;
-							}
+						if (needsCollider (x, y)) {
+							BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
+							bx2D.offset = new Vector2 (tileSize/2f + x * tileSize, tileSize/2f + y * tileSize) + (Vector2)transform.position;
+							bx2D.size = new Vector2 (tileSize, tileSize);
+							bx2D.isTrigger = t.isTrigger;
 						}
 					}
 				}
@@ -191,14 +149,98 @@ public class TiledMapGeneration : MonoBehaviour {
 		}
 	}
 
+	private bool needsCollider (int x, int y) {
+		bool needsCollider = false;
+		if (!tiledmap.tiles[x * tiledmap.height + y].hasCollider) {
+			return needsCollider;
+		}
+		if (!tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + Mathf.Clamp (y, 0, height - 1)].hasCollider || tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + y].isTrigger) {
+			needsCollider = true;
+		}
+		if (!tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + Mathf.Clamp (y + 1, 0, height - 1)].hasCollider || tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + y].isTrigger) {
+			needsCollider = true;
+		}
+		if (!tiledmap.tiles[Mathf.Clamp (x, 0, width - 1) * tiledmap.height + Mathf.Clamp (y + 1, 0, height - 1)].hasCollider || tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + y].isTrigger) {
+			needsCollider = true;
+		}
+		if (!tiledmap.tiles[Mathf.Clamp (x - 1, 0, width - 1) * tiledmap.height + Mathf.Clamp (y + 1, 0, height - 1)].hasCollider || tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + y].isTrigger) {
+			needsCollider = true;
+		}
+		if (!tiledmap.tiles[Mathf.Clamp (x - 1, 0, width - 1) * tiledmap.height + Mathf.Clamp (y, 0, height - 1)].hasCollider || tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + y].isTrigger) {
+			needsCollider = true;
+		}
+		if (!tiledmap.tiles[Mathf.Clamp (x - 1, 0, width - 1) * tiledmap.height + Mathf.Clamp (y - 1, 0, height - 1)].hasCollider || tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + y].isTrigger) {
+			needsCollider = true;
+		}
+		if (!tiledmap.tiles[Mathf.Clamp (x, 0, width - 1) * tiledmap.height + Mathf.Clamp (y - 1, 0, height - 1)].hasCollider || tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + y].isTrigger) {
+			needsCollider = true;
+		}
+		if (!tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + Mathf.Clamp (y - 1, 0, height - 1)].hasCollider || tiledmap.tiles[Mathf.Clamp (x + 1, 0, width - 1) * tiledmap.height + y].isTrigger) {
+			needsCollider = true;
+		}
+		return needsCollider;
+	}
+
 	public void BuildTile (int x, int y) {
-		verts[y * tiledmap.width + x] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize,
+		verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize,
 			tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution);
 		for (int i = 0; i < 4; i++) {
-			uv[(y * tiledmap.width + x) * 4 + i] = verts[y * tiledmap.width + x].uv[i];
-			mesh.uv[(y * tiledmap.width + x) * 4 + i] = verts[y * tiledmap.width + x].uv[i];
+			uv[(x * tiledmap.height + y) * 4 + i] = verts[x * tiledmap.height + y].uv[i];
+			mesh.uv[(x * tiledmap.height + y) * 4 + i] = verts[x * tiledmap.height + y].uv[i];
 		}
+
 		mesh.uv = uv;
 		GetComponent <MeshFilter> ().mesh = mesh;
+
+	}
+
+	public void SaveTileMap () {
+		using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"Assets/Levels/" + gameObject.name + ".txt"))
+		{
+			for (int x = 0; x < tiledmap.width; x++) {
+				for (int y = 0; y < tiledmap.height; y++) {
+					file.Write (((int)tiledmap.tiles [x * tiledmap.height + y].type).ToString () + ".");
+				}
+			}
+
+		}
+	}
+
+	public void LoadTileMap () {
+		Tile[] tempTiles = new Tile[width * height];
+		int x, y;
+		string text = System.IO.File.ReadAllText(@"Assets/Levels/" + gameObject.name + ".txt");
+		string[] tileTexts = text.Split (new char[1] {'.'});
+		for (x = 0; x < tiledmap.width; x++) {
+			for (y = 0; y < tiledmap.height; y++) {
+				tempTiles[x * tiledmap.height + y] = new Tile ((TILE)Int32.Parse (tileTexts[x * tiledmap.height + y]));
+			}
+		}
+
+		for (x = 0; x < width; x++) {
+			for (y = 0; y < height; y++) {
+				if (tempTiles[x * height + y] == null) {
+					tempTiles[x * height + y] = new Tile (TILE.STONE);
+				}
+			}
+		}
+
+		tiledmap.tiles = tempTiles;
+		tiledmap.width = width;
+		tiledmap.height = height;
+	}
+
+	void OnDrawGizmos () {
+		if (displayLines) {
+			Gizmos.color = Color.green;
+	
+			for (int x = 0; x < tiledmap.width; x += 3) {
+				Gizmos.DrawLine (new Vector3 (x * tileSize, 0, 0) + transform.position, new Vector3 (x * tileSize, tiledmap.height * tileSize, 0) + transform.position);
+			}
+
+			for (int y = 0; y < tiledmap.height; y += 3) {
+				Gizmos.DrawLine (new Vector3 (0, y * tileSize, 0) + transform.position, new Vector3 (tiledmap.width * tileSize, y * tileSize, 0) + transform.position);
+			}
+		}
 	}
 }

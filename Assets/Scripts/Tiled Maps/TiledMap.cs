@@ -1,36 +1,29 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
-
-public class TiledMap : ScriptableObject {
-
+[Serializable]
+public class TiledMap {
 	public int width;
-
 	public int height;
+	[SerializeField]
+	public Tile[] tiles;
 
-	public Tile[,] tiles;
+	public TiledMap (int tmWidth, int tmHeight) {
+		width = tmWidth;
+		height = tmHeight;
 
-	public TiledMap (int width, int height) {
-		this.width = width;
-		this.height = height;
-
+		tiles = new Tile[tmWidth * tmHeight];
 
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				tiles[x,y] = new Tile (TILE.STONE);
+				tiles[x * height + y] = new Tile (TILE.STONE);
 			}
 		}
-
 	}
 
 	public int[] getTileTexCoordinatesAt (int x, int y) {
-		return tiles[x,y].texCoor;
-	}
-
-	[MenuItem("Assets/Create/Tile Map")]
-	public static void CreateAsset ()
-	{
-		ScriptableObjectUtility.CreateAsset<TiledMap> ();
+		return tiles[x * height + y].texCoor;
 	}
 
 }
