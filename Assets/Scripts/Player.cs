@@ -46,7 +46,7 @@ public class Player : MonoBehaviour {
 			letGo = true;
 
 			if (timer <= jumpTime) {
-				GetComponent<Rigidbody2D>().velocity = new Vector2 (GetComponent<Rigidbody2D>().velocity.x, GetComponent<Rigidbody2D>().velocity.y/2);
+				GetComponent<Rigidbody2D>().velocity = new Vector2 (GetComponent<Rigidbody2D>().velocity.x, GetComponent<Rigidbody2D>().velocity.y/1.5f);
 				timer = jumpTime + 1;
 			}
 		}
