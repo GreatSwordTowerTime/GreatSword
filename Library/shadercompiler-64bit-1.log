@@ -1,3 +1,25 @@
 Base path: /Applications/Unity/Unity.app/Contents
-Pipe name: \\.\pipe\UnityShaderCompiler-64bit-1-1961931536
+Pipe name: \\.\pipe\UnityShaderCompiler-64bit-1-2031993616
 Cmd: getPlatforms
+Cmd: compileSnippet
+  api=0 type=0 insize=14306 outsize=2633 kw=DIRECTIONAL SHADOWS_OFF LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF PIXELSNAP_ON ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=14306 outsize=6 kw=DIRECTIONAL SHADOWS_OFF LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF PIXELSNAP_ON ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=7914 outsize=1781 kw=DIRECTIONAL PIXELSNAP_ON ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=7914 outsize=6 kw=DIRECTIONAL PIXELSNAP_ON ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=7914 outsize=2112 kw=POINT PIXELSNAP_ON ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=7914 outsize=6 kw=POINT PIXELSNAP_ON ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=14306 outsize=3596 kw=DIRECTIONAL SHADOWS_OFF LIGHTMAP_OFF DIRLIGHTMAP_OFF DYNAMICLIGHTMAP_OFF VERTEXLIGHT_ON PIXELSNAP_ON ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=3647 outsize=1807 kw=POINT ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=3647 outsize=6 kw=POINT ok=1
+Cmd: compileSnippet
+  api=0 type=0 insize=938 outsize=5974 kw=POINT SHADOWS_OFF ok=1
+Cmd: compileSnippet
+  api=0 type=1 insize=938 outsize=6 kw=POINT SHADOWS_OFF ok=1

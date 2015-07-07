@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Editor\TileMapEditor.cs" />
      <None Include="Assets\Levels\Tile Layer 1 1x1y - Wing 1.txt" />
+     <None Include="Assets\Levels\Tile Layer 1 -1x1y - Wing 1.txt" />
      <None Include="Assets\Levels\Tile Layer 1 1x0y - Wing 1.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 	public static Player instance;
-	public Vector2 position {
+	public Vector3 position {
 		get {return transform.position;}
 	}
 	//how fast the player can go
@@ -14,7 +14,7 @@ public class Player : MonoBehaviour {
 	public float jumpForce;
 	//how long the jump lasts
 	public float jumpTime;
-	private bool right;
+	public bool right { get; private set; }
 	//in what direction the player moves
 	private bool isGrounded;
 	private bool jumping;
@@ -33,7 +33,7 @@ public class Player : MonoBehaviour {
 		if(Input.GetAxis ("Run") > 0) {
 			GetComponent<Rigidbody2D>().velocity = new Vector2 (speed * Input.GetAxis ("Horizontal") * multiplier, GetComponent<Rigidbody2D>().velocity.y);
 		}
-		if (Input.GetAxis ("Jump") > 0 && isGrounded  && !letGo) {
+		if (Input.GetAxis ("Jump") > 0 && isGrounded && !letGo) {
 			jumping = true;
 		}
 		if (jumping && timer <= jumpTime && !letGo) {
@@ -60,6 +60,12 @@ public class Player : MonoBehaviour {
 
 		} else if (Input.GetAxis ("Horizontal") < 0) {
 			transform.eulerAngles = new Vector3 (0, 180, 0);
+		}
+
+		if (!(Input.GetAxis ("Horizontal") == 0)) {
+			GetComponent <Animator> ().SetBool ("running", true);
+		} else {
+			GetComponent <Animator> ().SetBool ("running", false);
 		}
 
 	}

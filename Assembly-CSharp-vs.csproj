@@ -47,10 +47,14 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\CameraMovement.cs" />
+     <Compile Include="Assets\Scripts\Enemy.cs" />
+     <Compile Include="Assets\Scripts\FlyingEnemy.cs" />
+     <Compile Include="Assets\Scripts\FollowingEnemy.cs" />
+     <Compile Include="Assets\Scripts\Item.cs" />
      <Compile Include="Assets\Scripts\PixelPerfectC.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\ScriptableObjectUtility.cs" />
-     <Compile Include="Assets\Scripts\SwingSword.cs" />
+     <Compile Include="Assets\Scripts\Sword.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\MouseOver.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\Tile.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\TileProperties.cs" />
@@ -58,6 +62,7 @@
      <Compile Include="Assets\Scripts\Tiled Maps\TiledMap.cs" />
      <Compile Include="Assets\Scripts\Tiled Maps\TiledMapGeneration.cs" />
      <None Include="Assets\Levels\Tile Layer 1 1x1y - Wing 1.txt" />
+     <None Include="Assets\Levels\Tile Layer 1 -1x1y - Wing 1.txt" />
      <None Include="Assets\Levels\Tile Layer 1 1x0y - Wing 1.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

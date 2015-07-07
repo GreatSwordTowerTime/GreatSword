@@ -56,7 +56,4 @@ public class TileMapEditor : Editor {
 		}
 	}
 
-	void OnEnable () {
-		((TiledMapGeneration)target).LoadTileMap ();
-	}
 }
