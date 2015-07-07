@@ -98,12 +98,12 @@ public class TiledMapGeneration : MonoBehaviour {
 			for (y = 0; y < tiledmap.height; y++) {
 				int squareIndex = x * tiledmap.height + y;
 				int triOffset = squareIndex * 6;
-				triangles[triOffset] = (squareIndex) * 4 + 0;
+				triangles[triOffset] = (squareIndex) * 4 + 2;
 				triangles[triOffset + 1] = (squareIndex) * 4 + 3;
-				triangles[triOffset + 2] = (squareIndex) * 4 + 2;
-				triangles[triOffset + 3] = (squareIndex) * 4 + 0;
+				triangles[triOffset + 2] = (squareIndex) * 4 + 0;
+				triangles[triOffset + 3] = (squareIndex) * 4 + 3;
 				triangles[triOffset + 4] = (squareIndex) * 4 + 1;
-				triangles[triOffset + 5] = (squareIndex) * 4 + 3;
+				triangles[triOffset + 5] = (squareIndex) * 4 + 0;
 			}
 		}
 
