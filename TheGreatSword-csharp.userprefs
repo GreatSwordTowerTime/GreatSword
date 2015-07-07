@@ -1,10 +1,12 @@
 ﻿<Properties StartupItem="Assembly-CSharp-vs.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Player.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Editor/TileMapEditor.cs">
     <Files>
-      <File FileName="Assets/Scripts/Player.cs" Line="62" Column="62" />
-      <File FileName="Assets/Scripts/SwingSword.cs" Line="93" Column="93" />
-      <File FileName="Assets/Scripts/CameraMovement.cs" Line="35" Column="35" />
+      <File FileName="Assets/Scripts/Tiled Maps/TiledMapGeneration.cs" Line="149" Column="149" />
+      <File FileName="Assets/Scripts/Tiled Maps/TileVerts.cs" Line="104" Column="104" />
+      <File FileName="Assets/Scripts/Tiled Maps/TiledMap.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Player.cs" Line="1" Column="1" />
+      <File FileName="Assets/Editor/TileMapEditor.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

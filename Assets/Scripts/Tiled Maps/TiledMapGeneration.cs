@@ -11,6 +11,8 @@ public class TiledMapGeneration : MonoBehaviour {
 
 	public float tileSize = 1.0f;
 
+	public float individualTileSize = 1.0f;
+
 	public int tileResolution = 16;
 
 	public int width;
@@ -76,7 +78,7 @@ public class TiledMapGeneration : MonoBehaviour {
 
 		for (x = 0; x < tiledmap.width; x++) {
 			for(y = 0; y < tiledmap.height; y++) {
-				verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize, 
+				verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * individualTileSize, y * individualTileSize), tileSize, 
 					tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution); 
 			}
 		}
@@ -96,7 +98,6 @@ public class TiledMapGeneration : MonoBehaviour {
 			for (y = 0; y < tiledmap.height; y++) {
 				int squareIndex = x * tiledmap.height + y;
 				int triOffset = squareIndex * 6;
-				//int vertOffset = 
 				triangles[triOffset] = (squareIndex) * 4 + 0;
 				triangles[triOffset + 1] = (squareIndex) * 4 + 3;
 				triangles[triOffset + 2] = (squareIndex) * 4 + 2;
@@ -138,8 +139,8 @@ public class TiledMapGeneration : MonoBehaviour {
 					for (int y = 0; y < tiledmap.height; y++) {
 						if (needsCollider (x, y)) {
 							BoxCollider2D bx2D = tilesProperties.AddComponent <BoxCollider2D> ();
-							bx2D.offset = new Vector2 (tileSize/2f + x * tileSize, tileSize/2f + y * tileSize) + (Vector2)transform.position;
-							bx2D.size = new Vector2 (tileSize, tileSize);
+							bx2D.offset = new Vector2 (tileSize/2f + x * individualTileSize, individualTileSize/2f + y * individualTileSize) + (Vector2)transform.position;
+							bx2D.size = new Vector2 (individualTileSize, individualTileSize);
 							bx2D.isTrigger = t.isTrigger;
 						}
 					}
@@ -182,7 +183,7 @@ public class TiledMapGeneration : MonoBehaviour {
 	}
 
 	public void BuildTile (int x, int y) {
-		verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * tileSize, y * tileSize), tileSize,
+		verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * individualTileSize, y * individualTileSize), tileSize,
 			tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution);
 		for (int i = 0; i < 4; i++) {
 			uv[(x * tiledmap.height + y) * 4 + i] = verts[x * tiledmap.height + y].uv[i];
@@ -235,11 +236,11 @@ public class TiledMapGeneration : MonoBehaviour {
 			Gizmos.color = Color.green;
 	
 			for (int x = 0; x < tiledmap.width; x += 3) {
-				Gizmos.DrawLine (new Vector3 (x * tileSize, 0, 0) + transform.position, new Vector3 (x * tileSize, tiledmap.height * tileSize, 0) + transform.position);
+				Gizmos.DrawLine (new Vector3 (x * individualTileSize, 0, 0) + transform.position, new Vector3 (x * tileSize, tiledmap.height * individualTileSize, 0) + transform.position);
 			}
 
 			for (int y = 0; y < tiledmap.height; y += 3) {
-				Gizmos.DrawLine (new Vector3 (0, y * tileSize, 0) + transform.position, new Vector3 (tiledmap.width * tileSize, y * tileSize, 0) + transform.position);
+				Gizmos.DrawLine (new Vector3 (0, y * individualTileSize, 0) + transform.position, new Vector3 (tiledmap.width * tileSize, y * individualTileSize, 0) + transform.position);
 			}
 		}
 	}
