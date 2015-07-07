@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using System.Xml;
-
+[RequireComponent (typeof(MeshFilter))]
+[RequireComponent (typeof(MeshRenderer))]
 public class TiledMapGeneration : MonoBehaviour {
 
 	public float tileSize = 1.0f;
@@ -19,15 +20,13 @@ public class TiledMapGeneration : MonoBehaviour {
 
 	public Texture2D terrainTiles;
 
-	public Material material;
-
 	public GameObject[] tileObjects;
 
 	public TiledMap tiledmap;
 
 	public bool displayLines;
 
-	MeshFilter mesh_filter;
+	Mesh mesh;
 
 	TileVerts[] verts;
 
@@ -62,17 +61,57 @@ public class TiledMapGeneration : MonoBehaviour {
 
 		BuildTileProperties ();
 
-		verts = new TileVerts[tiledmap.width * tiledmap.height];
+		int tileCount = tiledmap.width * tiledmap.height;
 
-		GameObject tiles = new GameObject ("tiles");
-		tiles.transform.parent = gameObject.transform;
+		verts = new TileVerts[tileCount];
+
+		Vector3[] vertices = new Vector3[tileCount * 4];
+		Vector3[] normals = new Vector3[tileCount * 4];
+		Vector2[] uv = new Vector2[tileCount * 4];
+		int[] triangles = new int[tileCount * 4 * 6];
 
 		for (x = 0; x < tiledmap.width; x++) {
 			for(y = 0; y < tiledmap.height; y++) {
-				GameObject tile = BuildTile (x, y);
-				tile.transform.parent = tiles.transform;
+				verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * individualTileSize, y * individualTileSize), tileSize, 
+					tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution); 
 			}
 		}
+
+
+		int a = 0;
+		for (int i = 0; i <  verts.Length; i++) {
+			for (int j = 0; j < 4; j++) {
+				vertices[a] = verts[i].verts[j];
+				normals[a] = Vector3.back;
+				uv[a] = verts[i].uv[j];
+				a++;
+			}
+		}
+		
+		for (x = 0; x < tiledmap.width; x++) {
+			for (y = 0; y < tiledmap.height; y++) {
+				int squareIndex = x * tiledmap.height + y;
+				int triOffset = squareIndex * 6;
+				triangles[triOffset] = (squareIndex) * 4 + 2;
+				triangles[triOffset + 1] = (squareIndex) * 4 + 3;
+				triangles[triOffset + 2] = (squareIndex) * 4 + 0;
+				triangles[triOffset + 3] = (squareIndex) * 4 + 3;
+				triangles[triOffset + 4] = (squareIndex) * 4 + 1;
+				triangles[triOffset + 5] = (squareIndex) * 4 + 0;
+			}
+		}
+
+		mesh = new Mesh ();
+
+		mesh.vertices = vertices;
+		mesh.triangles = triangles;
+		mesh.normals = normals;
+		mesh.uv = uv;
+
+		MeshFilter mesh_filter = GetComponent <MeshFilter> ();
+		MeshRenderer mesh_renderer = GetComponent <MeshRenderer> ();
+		mesh_filter.mesh = mesh;
+		mesh_renderer.sharedMaterial.mainTexture = terrainTiles;
 
 	}
 
@@ -135,53 +174,13 @@ public class TiledMapGeneration : MonoBehaviour {
 		}
 		return needsCollider;
 	}
-
-	public GameObject BuildTile (int x, int y) {
-		if (!(GameObject.Find ("tile" + x.ToString () + y.ToString ()) == null)) {
-			DestroyImmediate (GameObject.Find ("tile" + x.ToString () + "." + y.ToString ()));
+		
+	public void BuildTile (int x, int y) {
+		verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * individualTileSize, y * individualTileSize), tileSize,
+			tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution);
+		for (int i = 0; i < 4; i++) {
+			mesh.uv[(x * tiledmap.height + y) * 4 + i] = verts[x * tiledmap.height + y].uv[i];
 		}
-
-		GameObject tile = new GameObject ("tile" + x.ToString () + "." + y.ToString ());
-		tile.transform.position = (new Vector3 (x, y, -(x + y)/100f) * individualTileSize) + transform.position;
-		Mesh mesh = new Mesh ();
-		Vector3[] vertices = new Vector3[4];
-		Vector3[] normals = new Vector3[4];
-		Vector2[] uv = new Vector2[4];
-		int[] triangles = new int[6];
-
-		vertices[0] = new Vector3 (0, 0, 0);
-		vertices[1] = new Vector3 (tileSize, 0, 0);
-		vertices[2] = new Vector3 (0, tileSize, 0);
-		vertices[3] = new Vector3 (tileSize, tileSize, 0);
-
-		uv[0] = new Vector2 ((float)tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution / (float)(terrainTiles.width), (float)tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution / (float)(terrainTiles.width));
-		uv[1] = new Vector2 ((float)(tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution + tileResolution) / (float)terrainTiles.width, (float)tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution / (float)terrainTiles.width);
-		uv[2] = new Vector2 ((float)tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution / (float)terrainTiles.width, (float)(tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution + tileResolution) / (float)terrainTiles.width);
-		uv[3] = new Vector2 ((float)(tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution + tileResolution) / (float)terrainTiles.width, (float)(tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution + tileResolution) / (float)terrainTiles.width);
-
-		for (int i = 0; i < 4; i++) 
-			normals[i] = Vector3.back;
-
-		triangles[0] = 0;
-		triangles[1] = 3;
-		triangles[2] = 2;
-		triangles[3] = 0;
-		triangles[4] = 1;
-		triangles[5] = 3;
-
-		tile.AddComponent <MeshFilter> ();
-		tile.AddComponent <MeshRenderer> ();
-
-		mesh.vertices = vertices;
-		mesh.normals = normals;
-		mesh.uv = uv;
-		mesh.triangles = triangles;
-		tile.GetComponent <MeshFilter> ().mesh = mesh;
-		tile.GetComponent <MeshRenderer> ().sharedMaterial = material;
-		tile.GetComponent <MeshRenderer> ().sharedMaterial.mainTexture = terrainTiles;
-
-		return tile;
-
 	}
 
 	public void SaveTileMap () {
