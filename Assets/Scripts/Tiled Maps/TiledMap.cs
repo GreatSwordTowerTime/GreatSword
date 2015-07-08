@@ -3,7 +3,7 @@ using UnityEditor;
 using System;
 using System.Collections;
 [Serializable]
-public class TiledMap {
+public class TiledMap : ScriptableObject {
 	public int width;
 	public int height;
 	[SerializeField]
@@ -24,6 +24,12 @@ public class TiledMap {
 
 	public int[] getTileTexCoordinatesAt (int x, int y) {
 		return tiles[x * height + y].texCoor;
+	}
+
+	[MenuItem("Assets/Create/Tile Map")]
+	public static void CreateAsset ()
+	{
+		ScriptableObjectUtility.CreateAsset<TiledMap> ();
 	}
 
 }

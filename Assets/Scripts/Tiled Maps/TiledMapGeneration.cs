@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 [RequireComponent (typeof(MeshFilter))]
 [RequireComponent (typeof(MeshRenderer))]
+[Serializable]
 public class TiledMapGeneration : MonoBehaviour {
 
 	public float tileSize = 1.0f;
@@ -25,9 +26,14 @@ public class TiledMapGeneration : MonoBehaviour {
 	public TiledMap tiledmap;
 
 	public bool displayLines;
-
+	[HideInInspector]
+	[SerializeField]
 	Mesh mesh;
-
+	[HideInInspector]
+	[SerializeField]
+	Vector2[] uv;
+	[HideInInspector]
+	[SerializeField]
 	TileVerts[] verts;
 
 	public void BuildMesh (bool resetTileMap) {
@@ -35,16 +41,11 @@ public class TiledMapGeneration : MonoBehaviour {
 		int x, y;
 
 		if (resetTileMap) {
-
-			tiledmap = new TiledMap (width, height);
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"Assets/Levels/" + gameObject.name + ".txt"))
-			{
-				for (x = 0; x < tiledmap.width; x++) {
-					for (y = 0; y < tiledmap.height; y++) {
-						file.Write ("0.");
-					}
+			tiledmap.tiles = new Tile[tiledmap.height * tiledmap.width];
+			for (x = 0; x < tiledmap.width; x++) {
+				for (y = 0; y < tiledmap.height; y++) {
+					tiledmap.tiles[x * tiledmap.height + y] = new Tile (TILE.STONE);
 				}
-
 			}
 
 		} else {
@@ -55,8 +56,6 @@ public class TiledMapGeneration : MonoBehaviour {
 				Debug.Log ("Didn't remember the width and height. Current Width and Height are " + new Vector2 (width, height));
 			}
 
-			LoadTileMap ();
-			SaveTileMap ();
 		}
 
 		BuildTileProperties ();
@@ -67,7 +66,7 @@ public class TiledMapGeneration : MonoBehaviour {
 
 		Vector3[] vertices = new Vector3[tileCount * 4];
 		Vector3[] normals = new Vector3[tileCount * 4];
-		Vector2[] uv = new Vector2[tileCount * 4];
+		uv = new Vector2[tileCount * 4];
 		int[] triangles = new int[tileCount * 4 * 6];
 
 		for (x = 0; x < tiledmap.width; x++) {
@@ -179,44 +178,11 @@ public class TiledMapGeneration : MonoBehaviour {
 		verts[x * tiledmap.height + y] = new TileVerts (new Vector3 (x * individualTileSize, y * individualTileSize), tileSize,
 			tileResolution, terrainTiles.width, tiledmap.getTileTexCoordinatesAt (x, y)[0] * tileResolution, tiledmap.getTileTexCoordinatesAt (x, y)[1] * tileResolution);
 		for (int i = 0; i < 4; i++) {
-			mesh.uv[(x * tiledmap.height + y) * 4 + i] = verts[x * tiledmap.height + y].uv[i];
+			uv[(x * tiledmap.height + y) * 4 + i] = verts[x * tiledmap.height + y].uv[i];
+			mesh.uv = uv;
+			GetComponent <MeshFilter> ().mesh = mesh;
+			GetComponent <MeshRenderer> ().sharedMaterial.mainTexture = terrainTiles;
 		}
-	}
-
-	public void SaveTileMap () {
-		using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"Assets/Levels/" + gameObject.name + ".txt"))
-		{
-			for (int x = 0; x < tiledmap.width; x++) {
-				for (int y = 0; y < tiledmap.height; y++) {
-					file.Write (((int)tiledmap.tiles [x * tiledmap.height + y].type).ToString () + ".");
-				}
-			}
-
-		}
-	}
-
-	public void LoadTileMap () {
-		Tile[] tempTiles = new Tile[width * height];
-		int x, y;
-		string text = System.IO.File.ReadAllText(@"Assets/Levels/" + gameObject.name + ".txt");
-		string[] tileTexts = text.Split (new char[1] {'.'});
-		for (x = 0; x < tiledmap.width; x++) {
-			for (y = 0; y < tiledmap.height; y++) {
-				tempTiles[x * tiledmap.height + y] = new Tile ((TILE)Int32.Parse (tileTexts[x * tiledmap.height + y]));
-			}
-		}
-
-		for (x = 0; x < width; x++) {
-			for (y = 0; y < height; y++) {
-				if (tempTiles[x * height + y] == null) {
-					tempTiles[x * height + y] = new Tile (TILE.STONE);
-				}
-			}
-		}
-
-		tiledmap.tiles = tempTiles;
-		tiledmap.width = width;
-		tiledmap.height = height;
 	}
 
 	void OnDrawGizmos () {

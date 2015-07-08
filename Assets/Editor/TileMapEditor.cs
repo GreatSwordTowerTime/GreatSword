@@ -36,8 +36,8 @@ public class TileMapEditor : Editor {
 				Ray r = Camera.current.ScreenPointToRay(new Vector3(e.mousePosition.x, -e.mousePosition.y + Camera.current.pixelHeight));
 				e.Use ();
 				Vector2 mouseToTile = r.origin - tiledmapG.transform.position;
-				mouseToTile = new Vector2 (Mathf.Clamp (Mathf.FloorToInt (mouseToTile.x/tiledmapG.tileSize), 0, tiledmapG.tiledmap.width - 1), 
-					Mathf.Clamp (Mathf.FloorToInt (mouseToTile.y/tiledmapG.tileSize), 0, tiledmapG.tiledmap.height - 1));
+				mouseToTile = new Vector2 (Mathf.Clamp (Mathf.FloorToInt (mouseToTile.x/tiledmapG.individualTileSize), 0, tiledmapG.tiledmap.width - 1), 
+					Mathf.Clamp (Mathf.FloorToInt (mouseToTile.y/tiledmapG.individualTileSize), 0, tiledmapG.tiledmap.height - 1));
 				tiledmap.
 				tiles[(int)mouseToTile.x * tiledmap.height + (int)mouseToTile.y].changeType ((TILE)tiledmapG.tileObjects[selected].GetComponent <TileProperties> ().tile);
 				for (int x = 0; x < size; x++) {
@@ -49,10 +49,9 @@ public class TileMapEditor : Editor {
 				}
 			}
 		} else if (e.type == EventType.mouseUp || e.type == EventType.used) {
-			tiledmapG.SaveTileMap ();
+			EditorUtility.SetDirty (target);
 		} else if (e.Equals (Event.KeyboardEvent ("tab"))) {
 			selected = (selected + 1)%list.Length;
-			EditorUtility.SetDirty (target);
 		}
 	}
 
