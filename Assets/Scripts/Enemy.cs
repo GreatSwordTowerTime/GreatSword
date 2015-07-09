@@ -20,7 +20,7 @@ public class Enemy : MonoBehaviour {
 		canMove = false;
 	}
 
-	void OnTriggerEnter2D (Collider2D col) {
+	void OnTriggerStay2D (Collider2D col) {
 		if (col.CompareTag ("Ground") || col.GetComponent<Collider2D>().CompareTag ("Tile")) {
 			canMove = true;
 		}
