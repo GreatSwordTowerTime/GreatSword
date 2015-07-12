@@ -54,11 +54,15 @@ public class Player : MonoBehaviour {
 	}
 
 	void Update () {
-		right = Input.GetAxis ("Horizontal") > 0;
-		if (Input.GetAxis ("Horizontal") > 0) {
+		if (Input.GetAxis ("Horizontal") > 0)
+			right = true;
+		if (Input.GetAxis ("Horizontal") < 0)
+			right = false;
+
+		if (right) {
 			transform.eulerAngles = new Vector3 (0, 0, 0);
 
-		} else if (Input.GetAxis ("Horizontal") < 0) {
+		} else {
 			transform.eulerAngles = new Vector3 (0, 180, 0);
 		}
 

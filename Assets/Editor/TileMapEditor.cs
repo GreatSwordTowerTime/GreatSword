@@ -17,10 +17,14 @@ public class TileMapEditor : Editor {
 		selected = EditorGUILayout.Popup (selected, list);
 		size = EditorGUILayout.IntField (size);
 
-		if(GUILayout.Button("Reset Tile Map")) {
-			map.BuildMesh (true);
+		if (GUILayout.Button ("Reset Tile Map")) {
+			if (EditorUtility.DisplayDialog ("Confirm Hard Reset", "Are you sure you want to delete previous tilemap and reset a new one?",
+			"Yes, I'm one hundred percent sure", "No")) {
+				map.BuildMesh (true);
+		    }
 		}
 
+		
 		if(GUILayout.Button("Build Tile Map")) {
 			map.BuildMesh (false);
 		}
@@ -50,6 +54,7 @@ public class TileMapEditor : Editor {
 			}
 		} else if (e.type == EventType.mouseUp || e.type == EventType.used) {
 			EditorUtility.SetDirty (target);
+			EditorUtility.SetDirty (tiledmapG.tiledmap);
 		} else if (e.Equals (Event.KeyboardEvent ("tab"))) {
 			selected = (selected + 1)%list.Length;
 		}

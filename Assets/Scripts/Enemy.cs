@@ -6,7 +6,7 @@ public class Enemy : MonoBehaviour {
 	public int health;
 	public int speed;
 	public bool canTakeDamage;
-	protected bool canMove = true;
+	public bool takingDamage { get; private set; }
 	protected Player player;
 
 	void Start () {
@@ -17,12 +17,12 @@ public class Enemy : MonoBehaviour {
 		if (canTakeDamage) {
 			health -= damage;
 		}
-		canMove = false;
+		takingDamage = true;
 	}
 
 	void OnTriggerStay2D (Collider2D col) {
 		if (col.CompareTag ("Ground") || col.GetComponent<Collider2D>().CompareTag ("Tile")) {
-			canMove = true;
+			takingDamage = false;
 		}
 	}
 

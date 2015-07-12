@@ -30,6 +30,7 @@ public class Sword : Item {
 	void OnTriggerEnter2D (Collider2D col) {
 		if (col.CompareTag ("Enemy")) {
 			col.GetComponent <Enemy> ().takeDamage (damage);
+			col.GetComponent <Rigidbody2D> ().velocity = Vector2.zero;
 			col.GetComponent <Rigidbody2D> ().AddForce (Player.instance.right ? Vector2.right * hitForce + Vector2.up * hitForce : -Vector2.right * hitForce + Vector2.up * hitForce);
 		}
 	}

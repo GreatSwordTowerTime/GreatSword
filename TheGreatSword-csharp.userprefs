@@ -1,12 +1,15 @@
 ﻿<Properties StartupItem="Assembly-CSharp-vs.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Tiled Maps/TiledMapGeneration.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/FollowingEnemy.cs">
     <Files>
-      <File FileName="Assets/Scripts/Tiled Maps/TiledMapGeneration.cs" Line="4" Column="4" />
-      <File FileName="Assets/Scripts/Tiled Maps/TileVerts.cs" Line="13" Column="13" />
+      <File FileName="Assets/Scripts/Player.cs" Line="10" Column="10" />
+      <File FileName="Assets/Scripts/Enemy.cs" Line="29" Column="29" />
+      <File FileName="Assets/Scripts/FollowingEnemy.cs" Line="20" Column="20" />
+      <File FileName="Assets/Scripts/FEnemyGraphics.cs" Line="56" Column="56" />
+      <File FileName="Assets/Scripts/Sword.cs" Line="62" Column="62" />
+      <File FileName="Assets/Scripts/Tiled Maps/TiledMapGeneration.cs" Line="31" Column="31" />
+      <File FileName="Assets/Editor/TileMapEditor.cs" Line="26" Column="26" />
       <File FileName="Assets/Scripts/Tiled Maps/TiledMap.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Player.cs" Line="1" Column="1" />
-      <File FileName="Assets/Editor/TileMapEditor.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Tiled Maps/Tile.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
