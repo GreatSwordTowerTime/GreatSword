@@ -126,7 +126,6 @@ public class TiledMapGeneration : MonoBehaviour {
 			GameObject tilesProperties = (GameObject)Instantiate (tileObjects[i]);
 			TileProperties t = tileObjects[i].GetComponent <TileProperties> ();
 			if(t.hasCollider) {
-			
 				for (int x = 0; x < tiledmap.width; x++) {
 					for (int y = 0; y < tiledmap.height; y++) {
 						if (needsCollider (x, y)) {

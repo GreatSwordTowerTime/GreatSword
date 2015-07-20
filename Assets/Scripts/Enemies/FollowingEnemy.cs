@@ -31,6 +31,10 @@ public class FollowingEnemy : Enemy {
 		}
 		GetComponent <Animator> ().SetBool ("walking", Mathf.Abs (disFromPlayer) < distance && !takingDamage);
 		GetComponent <Animator> ().SetBool ("jumping", jumping);
+		if (health <= 0) {
+			GetComponent <Animator> ().SetBool ("dead", true);
+			gameObject.SetActive (false);
+		}
 	}
 
 	void OnTriggerEnter2D (Collider2D col) {

@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour {
 	}
 
 	void OnTriggerStay2D (Collider2D col) {
-		if (col.CompareTag ("Ground") || col.GetComponent<Collider2D>().CompareTag ("Tile")) {
+		if (col.CompareTag ("Ground") || col.GetComponent <Collider2D> ().CompareTag ("Tile")) {
 			takingDamage = false;
 		}
 	}

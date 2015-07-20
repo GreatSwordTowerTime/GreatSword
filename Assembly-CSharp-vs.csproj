@@ -47,11 +47,12 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\CameraMovement.cs" />
-     <Compile Include="Assets\Scripts\Enemy.cs" />
-     <Compile Include="Assets\Scripts\FEnemyGraphics.cs" />
-     <Compile Include="Assets\Scripts\FlyingEnemy.cs" />
-     <Compile Include="Assets\Scripts\FollowingEnemy.cs" />
+     <Compile Include="Assets\Scripts\Enemies\Enemy.cs" />
+     <Compile Include="Assets\Scripts\Enemies\FEnemyGraphics.cs" />
+     <Compile Include="Assets\Scripts\Enemies\FlyingEnemy.cs" />
+     <Compile Include="Assets\Scripts\Enemies\FollowingEnemy.cs" />
      <Compile Include="Assets\Scripts\Item.cs" />
+     <Compile Include="Assets\Scripts\NewBehaviourScript.cs" />
      <Compile Include="Assets\Scripts\PixelPerfectC.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\ScriptableObjectUtility.cs" />
